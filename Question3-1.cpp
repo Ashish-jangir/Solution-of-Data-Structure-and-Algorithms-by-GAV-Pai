@@ -1,3 +1,7 @@
+//Declare a one, two and a three-dimensional array in a programming language(such as C)
+//which has the capability to display the addresses of array elements. Verify the various
+//address calculation formulae that you have learnt in this chapter against the arrays that you
+//have declared in the program.
 #include<iostream>
 int main() {
 	int arr1[10], arr2[10][10], arr3[10][10][10];
