@@ -1,3 +1,17 @@
+//For the matrix A given below obtain a sparse matrix representation B. Write a program to
+//(i) Obtain B given matrix A as input, and
+//(ii) Obtain the transpose of A using matrix B.
+//0 0 0 0 0 0 0 0 0 0 0 0
+//0 -1 0 0 0 2 0 0 0 0 0 0
+//0 0 0 0 0 0 0 0 0 0 0 0
+//0 0 0 0 0 0 0 0 0 0 0 0
+//4 0 0 -3 0 0 0 0 0 1 0 0
+//0 0 0 0 0 0 0 0 0 0 0 0
+//0 0 0 0 0 0 0 0 0 0 0 0
+//-1 0 0 0 5 0 0 0 0 0 0 0
+//0 0 0 0 0 0 2 0 0 4 0 0
+//0 0 0 0 0 0 0 1 1 0 0 0
+
 #include<iostream>
 #include<vector>
 using std::vector;
