@@ -5,12 +5,9 @@
 //(iii) Find the length of L
 //(iv) Update device dj to dl and print the new list.
 
-//Using map class is easier but i am gonna use vector.
 #include<iostream>
-#include<vector>
 #include<string>
 #include<algorithm>
-using std::vector;
 using std::cout;
 using std::cin;
 using std::string;
@@ -25,57 +22,58 @@ void swap( string &a, string &b) {
 	a = b;
 	b = temp;
 }
-void display(vector<string> &L) {
+void display(string (&L)[50], int &n) {
 	cout << "List of perpheral Devices: "<<std::endl;
-	for (int i = 0; i < L.size(); i++) {
+	for (int i = 0; i < n; i++) {
 	cout<< i + 1 << ". " << L[i] <<std::endl;
 	}
 }
 
-void insert(vector<string> &L) {
-	L.push_back("0");
+void insert(string (&L)[50], int &n) {
 	cout << "Please enter new peripheral device: ";
-	cin >> L.back();
-	sort(L.begin(), L.end(), comp);
-	display(L);
+	cin >> L[n];
+	n++;
+	sort(L, L + n, comp);
+	display(L,n);
 }
-void deleteDevice(vector<string> &L) {
+void deleteDevice(string (&L)[50], int &n) {
 	string temp;
 	cout << "Please enter the device that you want to delete: ";
 	cin >>temp;
-	for(int i = 0; i < L.size(); i++) {
+	for(int i = 0; i < n; i++) {
 		if(temp == L[i]) {
-			swap(L[i], L.back());
-			L.pop_back();
-			sort(L.begin(), L.end(), comp);
+			swap(L[i], L[n-1]);
+			n--;
+			sort(L, L + n, comp);
 			cout<<temp<< " is deleted from the list"<<std::endl;
 		}
 	}
-	display(L);
+	display(L,n);
 }
-void update(vector<string> &L) {
+void update(string (&L)[50], int &n) {
 	string dj,dl;
 	cout<<"Please Enter the new device and the device you want to update: ";
 	cin >> dj >> dl;
-	for(int i = 0; i < L.size(); i++) {
+	for(int i = 0; i < n; i++) {
 		if(dl == L[i]) {
 			L[i] = dj;
-			sort(L.begin(), L.end(), comp);
+			sort(L, L + n, comp);
 		}
 	}
-	display(L);
+	display(L, n);
 }
 int main() {
 	int n;
 	cout<< "Enter the number of peripheral devices: ";
 	cin>>n;
 	cout << "Please Enter the name of peripheral devices without space:";
-	vector<string> L(n);
+	string L[50];
 	for(int i = 0; i < n; i++)
 		cin >> L[i];
-	sort(L.begin(),L.end(),comp);
-	insert(L);
-	deleteDevice(L);
-	cout << "Length of the list: " << L.size() << std::endl;
-	update(L);
+	sort(L,L + n,comp);
+	insert(L,n);
+	deleteDevice(L,n);
+	cout << "Length of the list: " << n << std::endl;
+	update(L,n);
 }
+
