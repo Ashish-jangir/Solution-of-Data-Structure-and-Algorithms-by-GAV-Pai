@@ -1,7 +1,5 @@
-// It's personal opinion so no need to offend but while making this program i realised that multiply linked list is worst data structure to implement.
-// Multiply linked list is of no use.
-// Instead of doing these problems solve leetcode dsa questions.
-// Don't even waste your time to read this code just execute it to see all requrements meet and get done with it.
+// Multiply linked list is not so preferered data structure.
+// This code may look not optimized but question is not explained clearly in the book.
 #include <iostream>
 #include <string>
 using std::string;
