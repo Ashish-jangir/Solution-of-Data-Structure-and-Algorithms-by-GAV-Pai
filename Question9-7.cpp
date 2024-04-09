@@ -2,31 +2,34 @@
 Implement the ADT for graphs in a programming language of your choice choosing a linked representation for the graphs.
 ADT operations:
 - Check if graph G is empty
-    CHECK_GRAPH_EMPTY (G) (Boolean function)
+CHECK_GRAPH_EMPTY (G) (Boolean function)
 - Insert an isolated vertex V into a graph G. Ensure that V does not exist in G before insertion.
-    INSERT_VERTEX (G, V)
+INSERT_VERTEX (G, V)
 - Insert an edge connecting vertices U, V into a graph G. Ensure that such an edge does not exist in G before insertion.
-    INSERT_EDGE(G, U, V)
+INSERT_EDGE(G, U, V)
 - Delete vertex V and all the edges incident on it from the graph G. Ensure that such a vertex exists in the graph before deletion.
-    DELETE_VERTEX (G, V)
+DELETE_VERTEX (G, V)
 - Delete an edge from the graph G connecting the vertices U, V. Ensure that such an edge exists before deletion.
-    DELETE_EDGE (G, U, V)
+DELETE_EDGE (G, U, V)
 - Store ITEM into a vertex V of graph G
-    STORE_DATA(G, V, ITEM)
+STORE_DATA(G, V, ITEM)
 - Retrieve data of a vertex V in the graph G and return it in ITEM
-    RETRIEVE_DATA (G, V, ITEM)
+RETRIEVE_DATA (G, V, ITEM)
 - Perform Breadth first traversal of a graph G.
-    BFT (G)
+BFT (G)
 - Perform Depth first traversal of a graph G.
     DFT (G)
 */
 #include<iostream>
 #include<vector>
 #include<queue>
+#include<map>
 using std::vector;
 using std::cout;
 using std::cin;
 using std::queue;
+using std::map;
+using std::pair;
 int findMinInUnvisited(vector<bool>, vector<int>);
 
 class Graph {
@@ -43,7 +46,7 @@ class Graph {
         Node(int vertexTag, int edgeWeight) : vertexTag(vertexTag), edgeWeight(edgeWeight), data(0), link(nullptr) {}
     };
     int size;
-    vector<Node> headNodes;
+    map<int, Node> headNodes;
     vector<int> dfsTraversal;
     vector<int> bfsTraversal; 
     void DFS(int u, vector<bool> &visited) {
@@ -58,15 +61,17 @@ class Graph {
         }
     }
 public:
-    Graph(int size) : size(size) {
-        headNodes = vector<Node>(size);
-    }
+    Graph(int size) : size(size) { }
     Graph() : size(0) {}
 
     void InsertVertex() {
         Node node;
-        headNodes.push_back(node);
+        headNodes.insert(pair<int, Node>(headNodes.end()->first, node));
         size++;
+    }
+
+    void DeleteVertex(int vertexTag) {
+        headNodes.erase(vertexTag - 1);
     }
     
     void StoreData(int data, int vertex) {
@@ -79,6 +84,10 @@ public:
 
     void InsertEdge(int u, int v, int weight) {
         Node *nodeV = new Node(v, weight);
+        if(headNodes.find(u-1) == headNodes.end()) {
+            Node node;
+            headNodes.insert(pair<int, Node>(u - 1, node));
+        }
         if(headNodes.at(u-1).link == nullptr) {
             headNodes.at(u-1).link = nodeV;
         }
@@ -112,16 +121,21 @@ public:
     int getSize() {
         return size;
     }
+    bool isEmpty() {
+        return (headNodes.size() == 0);
+    }
     void displayGraph() {
-        for (size_t i = 0; i < size; i++)
+        auto it = headNodes.begin();
+        while (it != headNodes.end())
         {
-            cout << i + 1 << "\t->\t";
-            Node *temp = headNodes.at(i).link;
+            cout << it->first + 1 << "\t->\t";
+            Node *temp = it->second.link;
             while(temp != nullptr) {
                 cout << "( " <<temp->vertexTag << ", " << temp->edgeWeight << ") \t->\t";
                 temp = temp->link;
             }
             cout << "NULL\n";
+            it++;
         }
     }
     vector<int> DFSTraversal(int u) {
@@ -155,7 +169,7 @@ public:
     }
     vector<int> shortestPathDijkstra(int u) {
         //1. Assign infinite to all edges and create array of visited notes.
-        vector<int> weigth = vector<int>(size, INT16_MAX);
+        vector<int> weigth = vector<int>(size, INT_MAX);
         vector<bool> visited = vector<bool>(size, false);
         weigth[u-1] = 0;
         //2. run loop equal to size of the graph
@@ -178,7 +192,7 @@ public:
 };
 
 int findMinInUnvisited(vector<bool> visited, vector<int> weight) {
-    int min = INT16_MAX;
+    int min = INT_MAX;
     int indexMin = 0;
     for (size_t i = 0; i < visited.size(); i++)
     {
@@ -193,10 +207,9 @@ int findMinInUnvisited(vector<bool> visited, vector<int> weight) {
 }
 
 int main() {
-    //to check C++ version being used.
-    //std::cout << __cplusplus / 100 % 100 << '\n';
+    int numOfVertex, numOfEdges, opt, u, v, w, vertexTag;
+    vector<int> bfsTraversal, dfsTraversal;
     cout << "Please enter the number of vertices: ";
-    int numOfVertex, numOfEdges;
     cin >> numOfVertex;
     Graph graph = Graph(numOfVertex);
     cout << "Please enter number of edges: ";
@@ -204,32 +217,89 @@ int main() {
     cout << "Please Enter pairs of first, last vertex and weight of edges\n";
     for (size_t i = 0; i < numOfEdges; i++)
     {
-        int u, v, w;
         cin >> u >> v >> w;
         graph.InsertEdge(u, v, w);
     }
-    cout << "Graph\n";
-    graph.displayGraph();
-    vector<int> shortestPaths = graph.shortestPathDijkstra(1);
 
-    cout << "Shortest paths: \n";
-    for (size_t i = 0; i < shortestPaths.size(); i++)
-    {
-        cout << i + 1 << " " << shortestPaths[i] << std::endl;
+    bool quit = false;
+    while(!quit) {
+        cout << "1. Check if graph G is empty\n";
+        cout << "2. Insert an isolated vertex V into a graph G\n";
+        cout << "3. Insert an edge connecting vertices U, V into a graph G.\n";
+        cout << "4. Delete vertex V and all the edges incident on it from the graph G.\n";
+        cout << "5. Delete an edge from the graph G connecting the vertices U, V.\n";
+        cout << "6. Store ITEM into a vertex V of graph G\n";
+        cout << "7. Retrieve data of a vertex V in the graph G and return it in ITEM\n";
+        cout << "8. Perform Breadth first traversal of a graph G.\n";
+        cout << "9. Perform Depth first traversal of a graph G.\n";
+        cout << "10. Display Graph\n";
+        cout << "11. End\n";
+        cin >> opt;
+        switch (opt)
+        {
+        case 1:
+            cout << "Graph is " << (graph.isEmpty() ? "" : "not ") << "empty\n";
+            break;
+        case 2:
+            graph.InsertVertex();
+            break;
+        case 3:
+            cout << "Please insert u, v and weight: ";
+            cin >> u >> v >> w;
+            graph.InsertEdge(u, v, w);
+            break;
+        case 4:
+            cout << "Please insert vertex that needs to be deleted: ";
+            cin >> vertexTag;
+            graph.DeleteVertex(vertexTag);
+            break;
+        case 5:
+            cout << "Please insert u and v: ";
+            cin >> u >> v;
+            graph.DeleteEdge(u, v);
+            break;
+        case 6:
+            cout << "Please insert the vertex and iteam data: ";
+            int data;
+            cin >> vertexTag >> data;
+            graph.StoreData(data, vertexTag);
+            break;
+        case 7:
+            cout << "Please insert vertex for which data needs to be retrieved: ";
+            cin >> vertexTag;
+            graph.RetrieveData(vertexTag);
+            break;
+        case 8:
+            cout << "Starting vertex for Breath First Traversal: ";
+            cin >> u;
+            cout << "BFS travesal:\n";
+            bfsTraversal = graph.BFSTraversal(u);
+            for (size_t i = 0; i < bfsTraversal.size(); i++)
+            {
+                cout<<bfsTraversal.at(i) << " ";
+            }
+            cout << std::endl;
+            break;
+        case 9:
+            cout << "Starting vertex for Depth First Traversal: ";
+            cin >> u;
+            cout << "DFS travesal:\n";
+            dfsTraversal = graph.DFSTraversal(u);
+            for (size_t i = 0; i < bfsTraversal.size(); i++)
+            {
+                cout<<dfsTraversal.at(i) << " ";
+            }
+            cout << std::endl;
+            break;
+        case 10:
+            cout << "Graph\n";
+            graph.displayGraph();
+            break;
+        default:
+            quit = true;
+            break;
+        }
     }
-    
-    // cout << "Please enter the starting node from where graph should be traversed.";
-    // int u;
-    // cin >> u;
-    // cout << "BFS travesal:\n";
-    // vector<int> bfsTraversal = graph.BFSTraversal(u);
-    // for (size_t i = 0; i < bfsTraversal.size(); i++)
-    // {
-    //     cout<<bfsTraversal.at(i) << " ";
-    // }
-    // cout << std::endl;
-
-    // cout << "Is Graph connected: " << graph.isConnected() << std::endl;
     
     return 0;
 }
