@@ -72,6 +72,19 @@ public:
 
     void DeleteVertex(int vertexTag) {
         headNodes.erase(vertexTag - 1);
+        auto it = headNodes.begin();
+        while(it != headNodes.end()) {
+            Node *temp = it->second.link, *previous = &it->second;
+            while(temp != nullptr) {
+                if(temp->vertexTag == vertexTag) {
+                    previous->link = temp->link;
+                    delete(temp);
+                }
+                previous = temp;
+                temp = temp->link;
+            }
+            it++;
+        }
     }
     
     void StoreData(int data, int vertex) {
@@ -86,6 +99,7 @@ public:
         Node *nodeV = new Node(v, weight);
         if(headNodes.find(u-1) == headNodes.end()) {
             Node node;
+            node.vertexTag = u;
             headNodes.insert(pair<int, Node>(u - 1, node));
         }
         if(headNodes.at(u-1).link == nullptr) {
@@ -99,7 +113,7 @@ public:
     }
 
     void DeleteEdge(int u, int v) {
-        Node *temp = headNodes[u-1].link, *previous = nullptr;
+        Node *temp = &headNodes[u-1], *previous = nullptr;
         bool found = false;
         while(temp != nullptr) {
             if(temp->vertexTag == v) {
@@ -110,7 +124,7 @@ public:
             temp = temp->link;
         }
         if(found) {
-            previous = temp->link;
+            previous->link = temp->link;
             delete(temp);
         }
         else {
@@ -121,9 +135,11 @@ public:
     int getSize() {
         return size;
     }
+    
     bool isEmpty() {
         return (headNodes.size() == 0);
     }
+    
     void displayGraph() {
         auto it = headNodes.begin();
         while (it != headNodes.end())
@@ -138,12 +154,14 @@ public:
             it++;
         }
     }
+    
     vector<int> DFSTraversal(int u) {
         vector<bool> visited = vector<bool>(size, false);
         dfsTraversal.clear();
         DFS(u, visited);
         return dfsTraversal;
     }
+    
     vector<int> BFSTraversal(int u) {
         vector<bool> visited = vector<bool>(size, false);
         bfsTraversal.clear();
@@ -167,9 +185,10 @@ public:
         DFSTraversal(1);
         return (headNodes.size() == dfsTraversal.size());
     }
+    
     vector<int> shortestPathDijkstra(int u) {
         //1. Assign infinite to all edges and create array of visited notes.
-        vector<int> weigth = vector<int>(size, INT_MAX);
+        vector<int> weigth = vector<int>(size, INT16_MAX);
         vector<bool> visited = vector<bool>(size, false);
         weigth[u-1] = 0;
         //2. run loop equal to size of the graph
@@ -192,7 +211,7 @@ public:
 };
 
 int findMinInUnvisited(vector<bool> visited, vector<int> weight) {
-    int min = INT_MAX;
+    int min = INT16_MAX;
     int indexMin = 0;
     for (size_t i = 0; i < visited.size(); i++)
     {
@@ -207,7 +226,7 @@ int findMinInUnvisited(vector<bool> visited, vector<int> weight) {
 }
 
 int main() {
-    int numOfVertex, numOfEdges, opt, u, v, w, vertexTag;
+    int numOfVertex, numOfEdges, opt, u, v, w, vertexTag, data;
     vector<int> bfsTraversal, dfsTraversal;
     cout << "Please enter the number of vertices: ";
     cin >> numOfVertex;
@@ -260,14 +279,14 @@ int main() {
             break;
         case 6:
             cout << "Please insert the vertex and iteam data: ";
-            int data;
             cin >> vertexTag >> data;
             graph.StoreData(data, vertexTag);
             break;
         case 7:
             cout << "Please insert vertex for which data needs to be retrieved: ";
             cin >> vertexTag;
-            graph.RetrieveData(vertexTag);
+            data = graph.RetrieveData(vertexTag);
+            cout << "Retrieved data: " << data << std::endl;
             break;
         case 8:
             cout << "Starting vertex for Breath First Traversal: ";
